@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+set -e
+set -o pipefail
+
+function indent() {
+  c='s/^/       /'
+  case $(uname) in
+    Darwin) sed -l "$c";;
+    *)      sed -u "$c";;
+  esac
+}
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+
+export UBUNTU_URL=http://us.archive.ubuntu.com/ubuntu/pool
+
+install () {
+  DEB_URL=$1
+  DIR=$(mktemp -d)
+  curl -f $DEB_URL > $DIR/deb
+  dpkg-deb -x $DIR/deb $BUILD_DIR/sw
+}
+
+mkdir $BUILD_DIR/sw
+
+install $UBUNTU_URL/main/l/lsof/lsof_4.81.dfsg.1-1build1_amd64.deb
+install http://ppa.launchpad.net/chris-lea/libpgm/ubuntu/pool/main/libp/libpgm/libpgm-5.1-0_5.1.116-1chl1~lucid1_amd64.deb
+install http://ppa.launchpad.net/chris-lea/zeromq/ubuntu/pool/main/z/zeromq/libzmq1_2.1.11-1chl1~lucid1_amd64.deb
+install http://ppa.launchpad.net/chris-lea/zeromq/ubuntu/pool/main/z/zeromq/libzmq-dev_2.1.11-1chl1~lucid1_amd64.deb
+
+export LDFLAGS="-L$BUILD_DIR/sw/lib -L$BUILD_DIR/sw/usr/lib"
+export CPPFLAGS="-I$BUILD_DIR/sw/usr/include"
+export PATH="$GEM_HOME/bin:$BUILD_DIR/sw/bin:$BUILD_DIR/sw/usr/bin:$PATH"
+
+SPIPED_DIR=$(mktemp -d)
+curl http://www.tarsnap.com/spiped/spiped-1.1.0.tgz |tar zxf - -C $SPIPED_DIR
+cd $SPIPED_DIR/spiped-1.1.0
+make
+cp spiped $BUILD_DIR/sw/usr/bin/

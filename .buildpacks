@@ -1,0 +1,2 @@
+git://github.com/kr/heroku-buildpack-inline
+git://github.com/heroku/heroku-buildpack-ruby

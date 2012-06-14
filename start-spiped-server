@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+set -x
+spiped -d -F -s $SPIPED_SERVER_SOURCE_SOCKET -t $SPIPED_SERVER_TARGET_SOCKET -k key

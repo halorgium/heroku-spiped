@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -x
+rm -f $SPIPED_CLIENT_SOURCE_SOCKET
+spiped -e -F -s $SPIPED_CLIENT_SOURCE_SOCKET -t $SPIPED_CLIENT_TARGET_SOCKET -k key
